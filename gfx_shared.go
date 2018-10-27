@@ -50,3 +50,30 @@ func InitGreyPalette(p [256]uint32) {
 		paletteRGBA[i] = color.RGBA{byte(c), byte(c >> 8), byte(c >> 16), 255}
 	}
 }
+
+// InitGreyShadedPalette will initialize a palette that goes from
+// black -> neutral -> white.
+// Specify the palette index where the color should be the supplied value.
+func InitShadedPalette(neutral int, rgb color.RGBA) {
+	var palette [256]uint32
+	rC, gC, bC := int(rgb.R), int(rgb.G), int(rgb.B)
+	flipScale := int(256.0 * (256.0 / float64(neutral)))
+	flipScale2 := int(256.0 * (256.0 / float64(255-neutral)))
+	for i := range palette[:] {
+		var r, g, b int
+		if i < neutral {
+			r = (i*rC*flipScale + 128) >> 16
+			g = (i*gC*flipScale + 128) >> 16
+			b = (i*bC*flipScale + 128) >> 16
+		} else {
+			r = rC
+			g = gC
+			b = bC
+			r += ((i - neutral) * (255 - rC) * flipScale2) >> 16
+			g += ((i - neutral) * (255 - gC) * flipScale2) >> 16
+			b += ((i - neutral) * (255 - bC) * flipScale2) >> 16
+		}
+		palette[i] = uint32(r) | (uint32(g) << 8) | (uint32(b) << 16)
+	}
+	InitGreyPalette(palette)
+}
