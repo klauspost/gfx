@@ -24,7 +24,7 @@ func Run(fn func()) {
 func RunTimed(effect TimedEffect) {
 	cfg := pixelgl.WindowConfig{
 		Title:  "Effect",
-		Bounds: pixel.R(0, 0, renderWidth*scale, renderHeight*scale),
+		Bounds: pixel.R(0, 0, fRenderWidth*scale, fRenderHeight*scale),
 		VSync:  true,
 	}
 	var (
@@ -40,15 +40,15 @@ func RunTimed(effect TimedEffect) {
 	}
 	c := win.Bounds().Center()
 	started := time.Now()
-	bar := pixel.MakePictureData(pixel.R(0, 0, 4, renderHeight*scale))
-	barRed := pixel.MakePictureData(pixel.R(0, 0, 4, renderHeight*scale))
+	bar := pixel.MakePictureData(pixel.R(0, 0, 4, fRenderHeight*scale))
+	barRed := pixel.MakePictureData(pixel.R(0, 0, 4, fRenderHeight*scale))
 	for i := range bar.Pix {
 		bar.Pix[i].G = 255
 		bar.Pix[i].A = 192
 		barRed.Pix[i].R = 255
 		barRed.Pix[i].A = 192
 	}
-	dst := pixel.MakePictureData(pixel.R(0, 0, renderWidth, renderHeight))
+	dst := pixel.MakePictureData(pixel.R(0, 0, fRenderWidth, fRenderHeight))
 	var fixedT *float64
 	var lastRenderT float64
 	for !win.Closed() {
@@ -87,12 +87,12 @@ func RunTimed(effect TimedEffect) {
 
 		// Draw vsync bar
 		if elapsed < 1 {
-			tl := win.Bounds().H() - (renderHeight*elapsed*scale)/2
-			pixel.NewSprite(bar, pixel.R(0, 0, 4, scale*renderHeight*elapsed)).
+			tl := win.Bounds().H() - (fRenderHeight*elapsed*scale)/2
+			pixel.NewSprite(bar, pixel.R(0, 0, 4, scale*fRenderHeight*elapsed)).
 				Draw(win, pixel.IM.Moved(pixel.Vec{2, tl}))
 		} else {
-			tl := win.Bounds().H() - (renderHeight*elapsed*scale)/2
-			pixel.NewSprite(barRed, pixel.R(0, 0, 4, renderHeight*scale*elapsed)).
+			tl := win.Bounds().H() - (fRenderHeight*elapsed*scale)/2
+			pixel.NewSprite(barRed, pixel.R(0, 0, 4, fRenderHeight*scale*elapsed)).
 				Draw(win, pixel.IM.Moved(pixel.Vec{2, tl}))
 		}
 		win.Update()

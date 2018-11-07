@@ -7,11 +7,21 @@ import (
 	"time"
 )
 
+var (
+	renderWidth   = 640
+	renderHeight  = 360
+	fRenderWidth  = 640.0
+	fRenderHeight = 360.0
+)
+
+func SetRenderSize(w, h int) {
+	renderWidth, renderHeight = w, h
+	fRenderWidth, fRenderHeight = float64(renderWidth), float64(renderHeight)
+}
+
 const (
-	renderWidth  = 640
-	renderHeight = 360
-	scale        = 2.0
-	vSync        = 60
+	scale = 2.0
+	vSync = 60
 )
 
 func RunTimedMusic(effect TimedEffect, musicFile string) {
