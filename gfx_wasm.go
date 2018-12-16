@@ -134,7 +134,7 @@ func RunTimed(fx TimedEffect) {
 			panic(fmt.Sprintf("Unhandled screen type: %T", screen))
 		}
 		if elapsed < 1 {
-			h := int(elapsed * renderHeight)
+			h := int(elapsed * float64(renderHeight))
 			for i := 0; i < h; i++ {
 				p := i * renderWidth * 4
 				screen32[p] = 0

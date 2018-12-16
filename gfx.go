@@ -10,6 +10,7 @@ import (
 	"image/png"
 	"math"
 	"os"
+	"path/filepath"
 	"sync"
 	"time"
 
@@ -118,6 +119,10 @@ func RunWriteToDisk(fx TimedEffect, n int, path string) {
 	type toSave struct {
 		img image.Image
 		fn  string
+	}
+	dir, err := filepath.Abs(path)
+	if err == nil {
+		os.MkdirAll(filepath.Dir(dir), os.ModePerm)
 	}
 	save := make(chan toSave)
 	var wg sync.WaitGroup
