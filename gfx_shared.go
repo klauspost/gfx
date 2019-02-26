@@ -12,6 +12,7 @@ var (
 	renderHeight  = 360
 	fRenderWidth  = 640.0
 	fRenderHeight = 360.0
+	fullscreen    = false
 )
 
 func SetRenderSize(w, h int) {
@@ -19,10 +20,18 @@ func SetRenderSize(w, h int) {
 	fRenderWidth, fRenderHeight = float64(renderWidth), float64(renderHeight)
 }
 
+func Fullscreen(b bool) {
+	fullscreen = b
+}
+
 const (
 	scale = 2.0
 	vSync = 60
 )
+
+func RunTimed(effect TimedEffect) {
+	RunTimedDur(effect, 10*time.Second)
+}
 
 func RunTimedMusic(effect TimedEffect, musicFile string) {
 	sfx, err := loadMusic(musicFile)

@@ -22,11 +22,14 @@ func Run(fn func()) {
 	pixelgl.Run(fn)
 }
 
-func RunTimed(effect TimedEffect) {
+func RunTimedDur(effect TimedEffect, duration time.Duration) {
 	cfg := pixelgl.WindowConfig{
 		Title:  "Effect",
 		Bounds: pixel.R(0, 0, fRenderWidth*scale, fRenderHeight*scale),
 		VSync:  true,
+	}
+	if fullscreen {
+		cfg.Monitor = pixelgl.PrimaryMonitor()
 	}
 	var (
 		frames = 0
@@ -59,7 +62,7 @@ func RunTimed(effect TimedEffect) {
 		}
 		startFrame := time.Now()
 		x, _ := QueryPerformanceCounter()
-		t := float64(startFrame.Sub(started)) / float64(time.Second*10)
+		t := float64(startFrame.Sub(started)) / float64(duration)
 		fixedT = updateInput(win, fixedT, lastRenderT)
 		if fixedT != nil {
 			t = *fixedT
@@ -230,6 +233,8 @@ func copyTo(dst *pixel.PictureData, src image.Image) {
 		copyToPaletted(dst, s)
 	case *image.Gray:
 		copyToGray(dst, s)
+	case *image.RGBA:
+		copyToRGBA(dst, s)
 	default:
 		copyToGen(dst, src)
 	}
@@ -318,6 +323,24 @@ func copyToGen(dst *pixel.PictureData, src image.Image) {
 					G: uint8(line[x*4+1] >> 8),
 					B: uint8(line[x*4+2] >> 8),
 					A: uint8(line[x*4+3] >> 8),
+				}
+		}
+	}
+}
+
+func copyToRGBA(dst *pixel.PictureData, src *image.RGBA) {
+	for y := 0; y < src.Rect.Dy(); y++ {
+		line := src.Pix[y*src.Stride : y*src.Stride+src.Rect.Dx()*4]
+		// Destination is flipped.
+		dstY := src.Rect.Dy() - y - 1
+		dLine := dst.Pix[dstY*dst.Stride : dstY*dst.Stride+src.Rect.Dx()]
+		for x := range dLine {
+			dLine[x] =
+				color.RGBA{
+					R: uint8(line[x*4]),
+					G: uint8(line[x*4+1]),
+					B: uint8(line[x*4+2]),
+					A: uint8(line[x*4+3]),
 				}
 		}
 	}

@@ -85,7 +85,7 @@ func Wait() {
 	<-ready
 }
 
-func RunTimed(fx TimedEffect) {
+func RunTimedDur(fx TimedEffect, duration time.Duration) {
 	canvas := getElementById("fx-display")
 	ctx := canvas.Call("getContext", "2d")
 	canvasData := ctx.Call("createImageData", renderWidth, renderHeight)
@@ -110,7 +110,7 @@ func RunTimed(fx TimedEffect) {
 			}
 		}()
 		startFrame := time.Now()
-		t := float64(startFrame.Sub(started)) / float64(time.Second*10)
+		t := float64(startFrame.Sub(started)) / float64(duration)
 		fixedT = updateInput(fixedT, lastRenderT)
 		if fixedT != nil {
 			t = *fixedT
@@ -130,6 +130,8 @@ func RunTimed(fx TimedEffect) {
 			copyToPaletted(screen32, scr)
 		case *image.Gray:
 			copyToGrey(screen32, scr)
+		case *image.RGBA:
+			copyToRGBA(screen32, scr)
 		default:
 			panic(fmt.Sprintf("Unhandled screen type: %T", screen))
 		}
@@ -211,6 +213,16 @@ func copyToGrey(dst []byte, src *image.Gray) {
 			dLine[x*4+2] = byte(p >> 16)
 			dLine[x*4+3] = 0xff
 		}
+	}
+}
+
+func copyToRGBA(dst []byte, src *image.RGBA) {
+	w, h := src.Rect.Dx(), src.Rect.Dy()
+	for y := 0; y < h; y++ {
+		line := src.Pix[y*src.Stride : y*src.Stride+w*4]
+		dstY := y * w * 4
+		dLine := dst[dstY : dstY+len(line)*4]
+		copy(dLine, line)
 	}
 }
 
