@@ -7,6 +7,7 @@ import (
 	"image"
 	"log"
 	"math"
+	"runtime/debug"
 	"syscall/js"
 	"time"
 )
@@ -45,6 +46,7 @@ func Run(fn func()) {
 	defer func() {
 		if r := recover(); r != nil {
 			setStatus(fmt.Sprintf("ERROR: %v", r))
+			debug.PrintStack()
 		}
 	}()
 	document = Global.Get("document")
@@ -107,6 +109,7 @@ func RunTimedDur(fx TimedEffect, duration time.Duration) {
 		defer func() {
 			if r := recover(); r != nil {
 				setStatus(fmt.Sprintf("ERROR: %v", r))
+				debug.PrintStack()
 			}
 		}()
 		startFrame := time.Now()
@@ -221,7 +224,7 @@ func copyToRGBA(dst []byte, src *image.RGBA) {
 	for y := 0; y < h; y++ {
 		line := src.Pix[y*src.Stride : y*src.Stride+w*4]
 		dstY := y * w * 4
-		dLine := dst[dstY : dstY+len(line)*4]
+		dLine := dst[dstY : dstY+len(line)]
 		copy(dLine, line)
 	}
 }
